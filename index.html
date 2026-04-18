@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Empower Home Services — Free Energy Analysis</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --sky: #00B8F3; --navy: #004164; --navy2: #015389; --coral: #FF6051;
+    --white: #ffffff; --off: #f0f7fc; --lb: #e0f5fd;
+    --grad-blue: linear-gradient(180deg,#00B8F3 0%,#004164 100%);
+    --grad-header: linear-gradient(135deg,#004164 0%,#015389 60%,#00B8F3 100%);
+    --grad-bg: linear-gradient(160deg,#004164 0%,#012d45 50%,#001e30 100%);
+  }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--grad-bg); min-height: 100vh; padding: 28px 16px 48px; }
+  body::before { content:''; position:fixed; inset:0; background-image:radial-gradient(circle,rgba(0,184,243,0.09) 1px,transparent 1px); background-size:30px 30px; pointer-events:none; z-index:0; }
+  #app { max-width: 640px; margin: 0 auto; position: relative; z-index: 1; }
+  .card { background: #fff; border-radius: 16px; box-shadow: 0 12px 50px rgba(0,0,0,0.25); overflow: hidden; }
+  .card-header { background: var(--grad-header); padding: 22px 28px 24px; text-align: center; position: relative; overflow: hidden; }
+  .card-header::before { content:''; position:absolute; top:-30px; right:-30px; width:120px; height:120px; border-radius:50%; background:rgba(0,184,243,0.1); }
+  .card-header::after { content:''; position:absolute; bottom:-20px; left:-20px; width:90px; height:90px; border-radius:50%; background:rgba(255,255,255,0.05); }
+  .logo-name { font-size: 26px; font-weight: 900; color: #fff; letter-spacing: 4px; text-transform: uppercase; line-height: 1; }
+  .logo-sub { font-size: 12px; font-weight: 600; color: var(--sky); letter-spacing: 3px; text-transform: uppercase; margin-top: 6px; }
+  .card-body { padding: 26px 28px 30px; }
+  /* Progress */
+  .progress-wrap { margin-bottom: 28px; }
+  .progress-track { display: flex; align-items: flex-start; justify-content: space-between; position: relative; }
+  .progress-track::before { content:''; position:absolute; top:15px; left:3%; right:3%; height:3px; background:#d0e8f5; z-index:0; border-radius:2px; }
+  .progress-fill { position:absolute; top:15px; left:3%; height:3px; background:var(--grad-blue); z-index:1; transition:width 0.4s ease; border-radius:2px; }
+  .progress-step { display:flex; flex-direction:column; align-items:center; z-index:2; flex:1; }
+  .step-dot { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:11px; transition:all 0.3s; border:2.5px solid #c0d8ea; background:#fff; color:#7aaccc; }
+  .step-dot.done { background:var(--grad-blue); border-color:var(--navy); color:#fff; }
+  .step-dot.active { background:var(--sky); border-color:var(--sky); color:#fff; box-shadow:0 0 0 4px rgba(0,184,243,0.2); }
+  .step-label { font-size:8.5px; margin-top:4px; color:#90b5cc; font-weight:500; text-align:center; line-height:1.2; }
+  .step-label.active { color:var(--navy); font-weight:800; }
+  .step-label.done { color:var(--sky); }
+  /* Section title */
+  .section-title { display:flex; align-items:center; gap:10px; margin-bottom:18px; padding-bottom:12px; border-bottom:2px solid var(--lb); }
+  .section-icon { width:36px; height:36px; border-radius:9px; background:var(--grad-blue); display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0; }
+  .section-title h2 { color:var(--navy); font-size:18px; font-weight:800; }
+  /* Labels */
+  .label { font-weight:700; color:var(--navy); margin-bottom:8px; font-size:14px; }
+  .label .req { color:var(--coral); margin-left:3px; }
+  .sublabel { color:#7a9aaa; font-size:12px; margin-top:-6px; margin-bottom:10px; }
+  /* Inputs */
+  select, input { width:100%; padding:11px 14px; border-radius:9px; border:1.5px solid #c8dfe8; font-size:14px; background:var(--off); margin-bottom:14px; outline:none; color:var(--navy); font-family:inherit; transition:all 0.2s; }
+  select:focus, input:focus { border-color:var(--sky); }
+  select.filled, input.filled { border-color:var(--sky); background:var(--lb); font-weight:600; }
+  select { cursor:pointer; color:#6a8fa5; }
+  select.filled { color:var(--navy); }
+  /* Radio / Check buttons */
+  .radio-group { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+  .radio-btn { padding:9px 16px; border-radius:9px; cursor:pointer; font-size:13px; font-weight:700; border:2px solid #c8dfe8; background:#fff; color:var(--navy); transition:all 0.2s; }
+  .radio-btn.selected { background:var(--grad-blue); border-color:var(--sky); color:#fff; box-shadow:0 3px 12px rgba(0,184,243,0.27); }
+  .check-group { display:flex; flex-direction:column; gap:10px; margin-bottom:14px; }
+  .check-btn { padding:12px 16px; border-radius:9px; cursor:pointer; font-size:14px; font-weight:700; text-align:left; display:flex; align-items:center; gap:12px; border:2px solid #c8dfe8; background:#fff; color:#4a6a7a; transition:all 0.2s; }
+  .check-btn.selected { border-color:var(--sky); background:var(--lb); color:var(--navy); }
+  .check-box { width:22px; height:22px; border-radius:6px; border:2px solid #c8dfe8; background:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:13px; font-weight:900; transition:all 0.2s; }
+  .check-btn.selected .check-box { background:var(--sky); border-color:var(--sky); color:#fff; }
+  /* Insight box */
+  .insight { background:linear-gradient(135deg,#e8f7fe,#f0fbff); border:1px solid rgba(0,184,243,0.33); border-left:4px solid var(--sky); border-radius:10px; padding:12px 14px; margin-top:4px; margin-bottom:14px; display:flex; gap:10px; align-items:flex-start; }
+  .insight-icon { font-size:16px; flex-shrink:0; margin-top:1px; }
+  .insight p { margin:0; font-size:13px; color:var(--navy); line-height:1.65; }
+  /* Nav */
+  .nav { display:flex; justify-content:space-between; margin-top:22px; padding-top:16px; border-top:1px solid var(--lb); }
+  .btn-back { padding:10px 22px; border-radius:9px; border:1.5px solid #c8dfe8; background:#fff; color:var(--navy); font-weight:700; cursor:pointer; font-size:14px; font-family:inherit; }
+  .btn-next { padding:11px 32px; border-radius:9px; border:none; background:var(--sky); color:#fff; font-weight:800; font-size:15px; cursor:pointer; box-shadow:0 4px 16px rgba(0,184,243,0.33); transition:all 0.2s; font-family:inherit; min-width:180px; }
+  .btn-next:disabled { background:#b8d4e0; box-shadow:none; cursor:not-allowed; }
+  /* Privacy note */
+  .privacy-note { background:var(--lb); border:1px solid rgba(0,184,243,0.27); border-radius:10px; padding:12px 14px; font-size:13px; color:var(--navy); line-height:1.6; margin-bottom:4px; }
+  /* Error */
+  .error-box { background:#fff0ef; border:1.5px solid var(--coral); border-radius:9px; padding:11px 14px; margin-top:12px; color:var(--coral); font-size:13px; font-weight:600; display:none; }
+  /* Validation */
+  .val-msg { color:var(--coral); font-size:12px; margin-top:-10px; margin-bottom:12px; font-weight:600; display:none; }
+  /* Results */
+  .results-header { background:var(--grad-header); padding:26px 28px 30px; text-align:center; position:relative; overflow:hidden; }
+  .results-header::before { content:''; position:absolute; top:-40px; right:-40px; width:160px; height:160px; border-radius:50%; background:rgba(0,184,243,0.1); }
+  .results-greeting { color:rgba(255,255,255,0.8); font-size:14px; margin-top:14px; margin-bottom:2px; }
+  .results-label { color:rgba(255,255,255,0.7); font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; }
+  .results-amount { color:var(--sky); font-size:56px; font-weight:900; line-height:1; text-shadow:0 2px 24px rgba(0,184,243,0.4); }
+  .results-sub { color:rgba(255,255,255,0.6); font-size:12px; margin-top:4px; }
+  .result-card { border-radius:12px; padding:15px 18px; margin-bottom:13px; }
+  .result-card .rc-title { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+  .result-card .rc-title span { font-weight:800; color:var(--navy); font-size:14px; }
+  .result-card p { margin:0; color:#3a5a6a; font-size:13.5px; line-height:1.65; }
+  .cta-box { margin-top:20px; background:var(--grad-header); border-radius:14px; padding:22px; text-align:center; }
+  .cta-label { color:var(--sky); font-size:11px; font-weight:800; letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; }
+  .cta-title { color:#fff; font-weight:800; font-size:17px; margin-bottom:8px; }
+  .cta-sub { color:rgba(255,255,255,0.65); font-size:13px; margin:0 0 16px; line-height:1.5; }
+  .cta-btns { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .cta-btns a { padding:12px 26px; border-radius:9px; font-weight:800; font-size:14px; text-decoration:none; }
+  .cta-primary { background:var(--sky); color:#fff; box-shadow:0 4px 18px rgba(0,184,243,0.33); }
+  .cta-secondary { background:rgba(255,255,255,0.1); color:#fff; border:1.5px solid rgba(255,255,255,0.25); }
+  .restart-btn { background:none; border:none; color:#90aabb; cursor:pointer; font-size:12px; text-decoration:underline; margin-top:14px; display:block; margin-left:auto; margin-right:auto; font-family:inherit; }
+  .footer { text-align:center; color:rgba(255,255,255,0.3); font-size:11px; margin-top:16px; line-height:1.7; }
+  /* Spinner */
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .spinner { display:inline-block; width:14px; height:14px; border:2.5px solid rgba(255,255,255,0.4); border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite; vertical-align:middle; margin-right:6px; }
+  /* Responsive */
+  @media (max-width: 480px) {
+    body { padding: 16px 10px 40px; }
+    .card-body { padding: 18px 16px 22px; }
+    .logo-name { font-size: 18px; letter-spacing: 2px; }
+    .results-amount { font-size: 42px; }
+    .btn-next { padding: 11px 20px; font-size: 14px; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="card" id="quiz-card"></div>
+  <p class="footer">Estimates based on typical usage patterns and may vary. Contact Empower for a precise assessment.<br>CA LIC #1057693 · AZ ROC #346621 · TECL #38765</p>
+</div>
+
+<script>
+const WEBHOOK_URL = "https://hooks.zapier.com/hooks/catch/18243949/u7jz24p/";
+const SUBMIT_LIVE = true;
+
+const STEPS = ["Electric Bill","Home Info","Solar & Battery","HVAC","Roof","Your Info","Results"];
+
+// ── Data state ───────────────────────────────────────────────────────────────
+let state = {
+  step: 0,
+  firstName: "", lastName: "", email: "", phone: "", interests: [],
+  hasSolar: "", solarKwh: "", hasBattery: "", batteries: "0",
+  hvac1Age: "", hasSecondHvac: "no", hvac2Age: "",
+  roofAge: "", roofType: "",
+  fullName: "", email: "", phone: "", interests: [],
+  submitting: false, submitError: null
+};
+
+// ── Label maps ───────────────────────────────────────────────────────────────
+const sqftLabels = { under_1000:"Under 1,000 sq ft","1000_1500":"1,000–1,500 sq ft","1500_2000":"1,500–2,000 sq ft","2000_2500":"2,000–2,500 sq ft","2500_3000":"2,500–3,000 sq ft","3000_4000":"3,000–4,000 sq ft","4000_plus":"4,000+ sq ft" };
+const ageLabels = { "0_5":"0–5 years","6_10":"6–10 years","11_15":"11–15 years","16_20":"16–20 years","20_plus":"20+ years" };
+const roofAgeLabels = { "0_5":"0–5 years","6_10":"6–10 years","11_15":"11–15 years","16_20":"16–20 years","20_25":"20–25 years","25_plus":"25+ years" };
+const yearLabels = { "1950":"Before 1960","1960":"1960s","1970":"1970s","1980":"1980s","1990":"1990s","2000":"2000s","2010":"2010–2014","2015":"2015–2019","2020":"2020–Present" };
+const interestLabels = { solar:"Solar & Battery Storage", hvac:"Heating & Air (HVAC)", roofing:"Roofing" };
+
+// ── Validation ───────────────────────────────────────────────────────────────
+const isValidEmail = e => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+const isValidPhone = p => p.replace(/\D/g,"").length >= 10;
+function stepValid(s) {
+  const d = state;
+  if (s === 0) return !!d.electricBill;
+  if (s === 1) return !!d.sqft && !!d.stories && !!d.yearBuilt;
+  if (s === 2) return !!d.hasSolar && !!d.hasBattery;
+  if (s === 3) return !!d.hvac1Age;
+  if (s === 4) return !!d.roofAge && !!d.roofType;
+  if (s === 5) return !!d.firstName.trim() && !!d.lastName.trim() && isValidEmail(d.email) && isValidPhone(d.phone) && d.interests.length > 0;
+  return true;
+}
+
+// ── Insights ─────────────────────────────────────────────────────────────────
+function getBillInsight(bill) {
+  const b = parseInt(bill); if (!b) return null;
+  if (b <= 200) return { icon:"💡", text:`At $${b}/month your usage is below average. Solar could still eliminate 50–60% of your bill, and pairing with a battery maximizes every kWh you generate.` };
+  if (b <= 400) return { icon:"💡", text:`At $${b}/month you're in the moderate range. Homeowners like you typically offset 60–70% of their bill with solar.` };
+  if (b <= 700) return { icon:"⚡", text:`A $${b}/month bill signals high consumption. Solar can realistically cut this by 65–75%.` };
+  if (b <= 1100) return { icon:"🔥", text:`At $${b}/month homes in this range see some of the best solar ROI — savings of 70–80% are common.` };
+  return { icon:"🚨", text:`A $${b}/month bill puts you in the top tier. A solar + battery system can slash this by 75–85%.` };
+}
+function getHomeInsights(sqft, stories, yearBuilt) {
+  const tips = []; const yr = parseInt(yearBuilt);
+  if (sqft === "4000_plus" || sqft === "3000_4000") tips.push({ icon:"🏡", text:"Large homes often benefit most from solar — higher consumption means bigger savings and faster payback periods." });
+  if (stories === "2") tips.push({ icon:"📐", text:"Two-story homes typically have smaller roof footprints relative to square footage. Empower optimizes panel layouts for maximum production." });
+  if (yr && yr <= 1980) tips.push({ icon:"🔌", text:`Homes built in the ${yr}s often have older 100-amp panels that may need upgrading to support modern solar systems.` });
+  if (yr && yr >= 2010) tips.push({ icon:"✅", text:`Newer construction from ${yr} typically has modern wiring and panel capacity, making solar installation faster and simpler.` });
+  return tips;
+}
+function getSolarInsights(hasSolar, solarKwh, hasBattery, batteries) {
+  const tips = [];
+  if (hasSolar === "yes" && hasBattery === "no") tips.push({ icon:"🔋", text:"You have solar but no battery — unused power gets sold back at low rates then bought back at peak rates. A battery stores that energy so you use your own power day and night." });
+  if (hasSolar === "no" && hasBattery === "no") tips.push({ icon:"☀️", text:"Without solar or a battery, 100% of your power comes from the grid. Adding solar + storage is the most impactful combination for energy independence." });
+  if (hasSolar === "yes" && hasBattery === "yes") {
+    const b = parseInt(batteries) || 0;
+    if (b === 1) tips.push({ icon:"🔋", text:"One battery is a great start, but a single unit provides 8–13 kWh — enough for essentials. A second could cover your home through the night." });
+    if (b >= 2) tips.push({ icon:"✅", text:`With ${b} batteries and solar you're well-positioned for near-total energy independence.` });
+  }
+  if (hasSolar === "yes" && solarKwh) {
+    const kwh = parseInt(solarKwh);
+    if (kwh <= 300) tips.push({ icon:"📊", text:`${kwh} kWh/month is on the lower end. This may indicate shading, panel aging, or an undersized system.` });
+    if (kwh >= 800) tips.push({ icon:"🌟", text:`${kwh} kWh/month is strong production! A battery would ensure you capture every bit of that energy.` });
+  }
+  return tips;
+}
+function getHvacInsights(hvac1Age, hasSecondHvac, hvac2Age) {
+  const tips = [];
+  if (["16_20","20_plus"].includes(hvac1Age)) tips.push({ icon:"⚠️", text:"HVAC units over 15 years old run at 40–60% of original efficiency. Modern systems (18–26 SEER) can cut HVAC energy use nearly in half." });
+  else if (hvac1Age === "11_15") tips.push({ icon:"📉", text:"A 10–15 year old HVAC unit is past its efficiency peak. It's likely costing more than a newer system would." });
+  else if (hvac1Age === "0_5") tips.push({ icon:"✅", text:"A newer HVAC system is great news! Keep it running optimally with Empower's semi-annual tune-up plans." });
+  if (hasSecondHvac === "yes" && ["16_20","20_plus"].includes(hvac2Age)) tips.push({ icon:"🔄", text:"Your second unit is also aging. Running two older units compounds energy waste." });
+  return tips;
+}
+function getRoofInsights(roofAge, roofType) {
+  const tips = []; if (!roofType || !roofAge) return tips;
+  const ageNum = { "0_5":3,"6_10":8,"11_15":13,"16_20":18,"20_25":22,"25_plus":27 }[roofAge] || 0;
+  if (roofType === "Shingle") {
+    if (ageNum >= 10) tips.push({ icon:"🏚️", text:`At ${ageNum}+ years, even if shingles look okay, the underlayment may be compromised. Installing solar on a failing roof means removing panels later — Empower recommends an inspection first.` });
+    else tips.push({ icon:"✅", text:"Your shingle roof has plenty of life left. You're in good shape to move forward with solar." });
+  }
+  if (roofType === "Tile") {
+    if (ageNum >= 15) tips.push({ icon:"🏺", text:`Tile roofs last 30–50 years but underlayment needs replacement every 20–25 years. At ${ageNum}+ years, this should be inspected before solar.` });
+    else tips.push({ icon:"✅", text:"Tile roofs are excellent for solar — durable and long-lasting. Your roof appears well within its service life." });
+  }
+  if (roofType === "Flat") {
+    tips.push({ icon:"📐", text:"Flat roofs work great with tilt-mount solar. Empower is experienced with flat roof installations." });
+    if (ageNum >= 10) tips.push({ icon:"⚠️", text:`Flat roof membranes last 15–25 years. At ${ageNum}+ years, worth inspecting before committing to solar.` });
+  }
+  if (roofType === "Steel") {
+    tips.push({ icon:"🔩", text:"Metal roofs are among the best for solar — panels can often be clipped on without penetrating the roof at all." });
+    if (ageNum >= 20) tips.push({ icon:"🔍", text:`Even metal roofs benefit from inspection at ${ageNum}+ years. Check for rust at seams and fastener corrosion.` });
+  }
+  return tips;
+}
+
+// ── Compute results ──────────────────────────────────────────────────────────
+function computeResults() {
+  const d = state;
+  const bill = parseInt(d.electricBill);
+  const hasSolar = d.hasSolar === "yes";
+  const hasBattery = d.hasBattery === "yes";
+  const sqftMid = { under_1000:800,"1000_1500":1250,"1500_2000":1750,"2000_2500":2250,"2500_3000":2750,"3000_4000":3500,"4000_plus":4500 }[d.sqft] || 2000;
+  const systemSize = Math.round((sqftMid/1000)*5*10)/10;
+  const solarPct = bill<=200?0.55:bill<=400?0.65:bill<=700?0.70:bill<=1100?0.75:0.80;
+  const solarMonthlySavings = hasSolar ? 0 : Math.round(bill*solarPct);
+  const solarAnnualSavings = solarMonthlySavings*12;
+  const batterySavings = hasSolar&&!hasBattery ? Math.round(bill*0.15)*12 : !hasSolar ? Math.round(bill*0.10)*12 : 0;
+  const hvacOld = a => ["16_20","20_plus"].includes(a);
+  const hvacMid = a => a === "11_15";
+  let hvacSavings=0, hvacNote="";
+  if (hvacOld(d.hvac1Age)) { hvacSavings+=Math.round(bill*0.25)*12; hvacNote="Your primary HVAC is significantly outdated. Upgrading to a high-efficiency system could reduce costs by up to 25%."; }
+  else if (hvacMid(d.hvac1Age)) { hvacSavings+=Math.round(bill*0.10)*12; hvacNote="Your primary HVAC is aging. A newer high-efficiency model could improve performance and lower your costs."; }
+  if (d.hasSecondHvac==="yes") {
+    if (hvacOld(d.hvac2Age)) { hvacSavings+=Math.round(bill*0.15)*12; hvacNote+=" Your second unit is also outdated and a strong upgrade candidate."; }
+    else if (hvacMid(d.hvac2Age)) { hvacNote+=" Your second unit is mid-age — keep an eye on efficiency."; }
+  }
+  const roofOld = ["16_20","20_25","25_plus"].includes(d.roofAge);
+  const roofVeryOld = ["20_25","25_plus"].includes(d.roofAge);
+  return { bill,hasSolar,hasBattery,solarMonthlySavings,solarAnnualSavings,systemSize,batterySavings,hvacSavings,hvacNote,roofOld,roofVeryOld,roofType:d.roofType,totalAnnualSavings:solarAnnualSavings+batterySavings+hvacSavings,sqftMid,solarPct };
+}
+
+// ── Webhook ──────────────────────────────────────────────────────────────────
+async function submitToZapier() {
+  const d = state;
+  const payload = {
+    "First Name": d.firstName,
+    "Last Name": d.lastName,
+    "Email": d.email,
+    "Phone": d.phone,
+    "Interests": d.interests.map(i => interestLabels[i]||i).join(", "),
+    "Monthly Electric Bill": `$${d.electricBill}/month`,
+    "Home Square Footage": sqftLabels[d.sqft]||d.sqft,
+    "Number of Stories": d.stories==="1"?"One Story":"Two Story",
+    "Year Built": yearLabels[d.yearBuilt]||d.yearBuilt,
+    "Has Solar": d.hasSolar==="yes"?"Yes":"No",
+    "Monthly Solar Production": d.solarKwh?`${d.solarKwh} kWh/month`:"N/A",
+    "Has Battery": d.hasBattery==="yes"?"Yes":"No",
+    "Number of Batteries": d.hasBattery==="yes"?d.batteries:"N/A",
+    "Primary HVAC Age": ageLabels[d.hvac1Age]||d.hvac1Age,
+    "Has Second HVAC": d.hasSecondHvac==="yes"?"Yes":"No",
+    "Second HVAC Age": d.hasSecondHvac==="yes"?(ageLabels[d.hvac2Age]||d.hvac2Age):"N/A",
+    "Roof Age": roofAgeLabels[d.roofAge]||d.roofAge,
+    "Roof Type": d.roofType,
+    "Submitted At": new Date().toISOString(),
+    "Source": "Empower Energy Quiz"
+  };
+  if (!SUBMIT_LIVE) { console.log("[Zapier] Preview:", payload); return; }
+  try {
+    const res = await fetch(WEBHOOK_URL, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) });
+    // Zapier returns 200 on success — treat anything in 200-299 range as success
+    if (res.status < 200 || res.status >= 300) throw new Error(`Webhook ${res.status}`);
+  } catch(err) {
+    // If it's a network/CORS error in dev, log but don't block
+    console.warn("[Zapier] fetch error:", err);
+    throw err;
+  }
+}
+
+// ── HTML helpers ─────────────────────────────────────────────────────────────
+function insightHTML(tips) {
+  return tips.map(t => `<div class="insight"><span class="insight-icon">${t.icon}</span><p>${t.text}</p></div>`).join("");
+}
+function progressHTML(step) {
+  const pct = Math.min((step/(STEPS.length-1))*94,94);
+  let dots = STEPS.map((s,i) => {
+    const cls = i<step?"done":i===step?"active":"";
+    const lbl = i<step?"done":i===step?"active":"";
+    return `<div class="progress-step"><div class="step-dot ${cls}">${i<step?"✓":i+1}</div><span class="step-label ${lbl}">${s}</span></div>`;
+  }).join("");
+  return `<div class="progress-wrap"><div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div>${dots}</div></div>`;
+}
+function logoHTML() {
+  return `<div class="logo-name">Empower Home Services</div><div class="logo-sub">Free Energy Analysis</div>`;
+}
+function navHTML(showBack, nextLabel, nextDisabled) {
+  const back = showBack ? `<button class="btn-back" onclick="goBack()">← Back</button>` : `<div></div>`;
+  return `<div class="nav">${back}<button class="btn-next" id="btn-next" onclick="goNext()" ${nextDisabled?"disabled":""}>${nextLabel}</button></div>`;
+}
+function selectHTML(id, value, options, placeholder) {
+  const opts = (placeholder?`<option value="">${placeholder}</option>`:"") + options.map(o=>`<option value="${o.value??o}" ${value===(o.value??o)?"selected":""}>${o.label??o}</option>`).join("");
+  return `<select id="${id}" onchange="s('${id}',this.value)" class="${value?'filled':''}">${opts}</select>`;
+}
+function radioHTML(name, value, options) {
+  return `<div class="radio-group">${options.map(o=>`<button class="radio-btn ${value===(o.value??o)?'selected':''}" onclick="s('${name}','${o.value??o}')">${o.label??o}</button>`).join("")}</div>`;
+}
+function checkHTML(name, values, options) {
+  return `<div class="check-group">${options.map(o=>{
+    const sel = values.includes(o.value);
+    return `<button class="check-btn ${sel?'selected':''}" onclick="toggleCheck('${name}','${o.value}')">${sel?`<div class="check-box">✓</div>`:`<div class="check-box"></div>`}<span>${o.icon} ${o.label}</span></button>`;
+  }).join("")}</div>`;
+}
+
+// ── State helpers ─────────────────────────────────────────────────────────────
+function s(key, val) {
+  state[key] = val;
+  render();
+}
+function toggleCheck(key, val) {
+  const arr = state[key];
+  state[key] = arr.includes(val) ? arr.filter(x=>x!==val) : [...arr, val];
+  render();
+}
+function goBack() { state.step--; state.submitError=null; render(); }
+function goNext() {
+  if (state.step === 5) { handleSubmit(); return; }
+  if (stepValid(state.step)) { state.step++; render(); }
+}
+
+// ── Submit ───────────────────────────────────────────────────────────────────
+function updateStep5Nav() {
+  const btn = document.getElementById('btn-next');
+  if (!btn) return;
+  const valid = stepValid(5);
+  btn.disabled = !valid || state.submitting;
+}
+
+async function handleSubmit() {
+  ['firstName','lastName','email','phone'].forEach(key => {
+    const el = document.getElementById(key);
+    if (el) state[key] = el.value;
+  });
+  state.submitting = true; state.submitError = null; render();
+  try { await submitToZapier(); } catch(err) { console.warn("[Zapier]", err); }
+  state.submitting = false;
+  state.step = 6;
+  render();
+}
+
+// ── Render ───────────────────────────────────────────────────────────────────
+function render() {
+  const d = state; const card = document.getElementById("quiz-card");
+
+  if (d.step === 6) { renderResults(card); return; }
+
+  const billOpts = Array.from({length:20},(_,i)=>({value:`${(i+1)*100}`,label:`$${(i+1)*100}/month`}));
+  const sqftOpts = Object.entries(sqftLabels).map(([v,l])=>({value:v,label:l}));
+  const yearOpts = Object.entries(yearLabels).map(([v,l])=>({value:v,label:l}));
+  const hvacOpts = Object.entries(ageLabels).map(([v,l])=>({value:v,label:l}));
+  const roofAgeOpts = Object.entries(roofAgeLabels).map(([v,l])=>({value:v,label:l}));
+  const solarKwhOpts = Array.from({length:20},(_,i)=>({value:`${(i+1)*100}`,label:`${(i+1)*100} kWh/month`}));
+  const batteryOpts = ["0","1","2","3","4","5+"];
+  const roofTypes = ["Shingle","Tile","Flat","Steel"];
+  const serviceOpts = [{value:"solar",label:"Solar & Battery Storage",icon:"☀️"},{value:"hvac",label:"Heating & Air (HVAC)",icon:"❄️"},{value:"roofing",label:"Roofing",icon:"🏠"}];
+
+  let body = "";
+
+  if (d.step === 0) {
+    const ins = getBillInsight(d.electricBill);
+    body = `
+      <div class="section-title"><div class="section-icon">⚡</div><h2>Your Electric Bill</h2></div>
+      <p style="color:#5a7a8a;margin-bottom:18px;font-size:14px;line-height:1.6">What is your average monthly electric bill?</p>
+      <div class="label">Average Monthly Electric Bill <span class="req">*</span></div>
+      ${selectHTML("electricBill", d.electricBill, billOpts, "Select a range...")}
+      ${ins ? `<div class="insight"><span class="insight-icon">${ins.icon}</span><p>${ins.text}</p></div>` : ""}
+      <div class="nav"><div></div><button class="btn-next" onclick="goNext()" ${!stepValid(0)?"disabled":""}>Continue →</button></div>`;
+  }
+
+  if (d.step === 1) {
+    body = `
+      <div class="section-title"><div class="section-icon">🏠</div><h2>About Your Home</h2></div>
+      <div class="label">Home Square Footage <span class="req">*</span></div>
+      ${selectHTML("sqft", d.sqft, sqftOpts, "Select range...")}
+      <div class="label">Number of Stories <span class="req">*</span></div>
+      ${radioHTML("stories", d.stories, [{value:"1",label:"One Story"},{value:"2",label:"Two Story"}])}
+      <div class="label">Year Home Was Built <span class="req">*</span></div>
+      ${selectHTML("yearBuilt", d.yearBuilt, yearOpts, "Select decade...")}
+      ${insightHTML(getHomeInsights(d.sqft, d.stories, d.yearBuilt))}
+      ${navHTML(true,"Continue →",!stepValid(1))}`;
+  }
+
+  if (d.step === 2) {
+    body = `
+      <div class="section-title"><div class="section-icon">☀️</div><h2>Solar & Battery</h2></div>
+      <div class="label">Do you currently have solar panels? <span class="req">*</span></div>
+      ${radioHTML("hasSolar", d.hasSolar, [{value:"yes",label:"✓ Yes"},{value:"no",label:"✗ No"}])}
+      ${d.hasSolar==="yes"?`<div class="label">Average Monthly Solar Production (kWh)</div>${selectHTML("solarKwh", d.solarKwh, solarKwhOpts, "Select production...")}` : ""}
+      <div class="label">Do you have a home battery? <span class="req">*</span></div>
+      ${radioHTML("hasBattery", d.hasBattery, [{value:"yes",label:"✓ Yes"},{value:"no",label:"✗ No"}])}
+      ${d.hasBattery==="yes"?`<div class="label">How many batteries do you have?</div>${radioHTML("batteries", d.batteries, batteryOpts.map(b=>({value:b,label:b})))}` : ""}
+      ${insightHTML(getSolarInsights(d.hasSolar, d.solarKwh, d.hasBattery, d.batteries))}
+      ${navHTML(true,"Continue →",!stepValid(2))}`;
+  }
+
+  if (d.step === 3) {
+    body = `
+      <div class="section-title"><div class="section-icon">❄️</div><h2>HVAC System</h2></div>
+      <div class="label">How old is your primary HVAC unit? <span class="req">*</span></div>
+      ${selectHTML("hvac1Age", d.hvac1Age, hvacOpts, "Select age range...")}
+      <div class="label">Do you have a second HVAC unit? <span class="req">*</span></div>
+      ${radioHTML("hasSecondHvac", d.hasSecondHvac, [{value:"yes",label:"Yes"},{value:"no",label:"No"}])}
+      ${d.hasSecondHvac==="yes"?`<div class="label">How old is your second HVAC unit?</div>${selectHTML("hvac2Age", d.hvac2Age, hvacOpts, "Select age range...")}` : ""}
+      ${insightHTML(getHvacInsights(d.hvac1Age, d.hasSecondHvac, d.hvac2Age))}
+      ${navHTML(true,"Continue →",!stepValid(3))}`;
+  }
+
+  if (d.step === 4) {
+    body = `
+      <div class="section-title"><div class="section-icon">🏗️</div><h2>Your Roof</h2></div>
+      <div class="label">How old is your roof? <span class="req">*</span></div>
+      ${selectHTML("roofAge", d.roofAge, roofAgeOpts, "Select age range...")}
+      <div class="label">What type of roof do you have? <span class="req">*</span></div>
+      ${radioHTML("roofType", d.roofType, roofTypes.map(r=>({value:r,label:r})))}
+      ${insightHTML(getRoofInsights(d.roofAge, d.roofType))}
+      ${navHTML(true,"Continue →",!stepValid(4))}`;
+  }
+
+  if (d.step === 5) {
+    const emailErr = d.email && !isValidEmail(d.email);
+    const phoneErr = d.phone && !isValidPhone(d.phone);
+    const btnLabel = d.submitting ? `<span class="spinner"></span>Submitting…` : "See My Results →";
+    body = `
+      <div class="section-title"><div class="section-icon">👤</div><h2>Almost There!</h2></div>
+      <p style="color:#5a7a8a;margin-bottom:18px;font-size:14px;line-height:1.6">Your personalized energy report is ready. Enter your info below and we'll show you your results instantly.</p>
+      <div class="label">First Name <span class="req">*</span></div>
+      <input type="text" id="firstName" placeholder="Jane" class="${d.firstName?'filled':''}" />
+      <div class="label">Last Name <span class="req">*</span></div>
+      <input type="text" id="lastName" placeholder="Smith" class="${d.lastName?'filled':''}" />
+      <div class="label">Email Address <span class="req">*</span></div>
+      <input type="email" id="email" placeholder="jane@example.com" class="${d.email?'filled':''}" />
+      ${emailErr?`<div style="color:var(--coral);font-size:12px;margin-top:-10px;margin-bottom:12px;font-weight:600">Please enter a valid email address.</div>`:""}
+      <div class="label">Phone Number <span class="req">*</span></div>
+      <input type="tel" id="phone" placeholder="(555) 867-5309" class="${d.phone?'filled':''}" />
+      ${phoneErr?`<div style="color:var(--coral);font-size:12px;margin-top:-10px;margin-bottom:12px;font-weight:600">Please enter a valid 10-digit phone number.</div>`:""}
+      <div class="label">What are you interested in? <span class="req">*</span></div>
+      <p class="sublabel">Select all that apply</p>
+      ${checkHTML("interests", d.interests, serviceOpts)}
+      <div class="privacy-note">🔒 Your information is private and will only be used by Empower Home Services.</div>
+      ${d.submitError?`<div class="error-box" style="display:block">⚠️ ${d.submitError}</div>`:""}
+      <div class="nav">
+        <button class="btn-back" onclick="goBack()" ${d.submitting?"disabled":""}>← Back</button>
+        <button class="btn-next" onclick="goNext()" ${(!stepValid(5)||d.submitting)?"disabled":""}>${btnLabel}</button>
+      </div>`;
+  }
+
+  card.innerHTML = `
+    <div class="card-header">${logoHTML()}</div>
+    <div class="card-body">${progressHTML(d.step)}${body}</div>`;
+
+  // Step 5: attach input listeners without re-rendering on each keystroke
+  if (d.step === 5) {
+    const attachInput = (id, key) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.value = state[key];
+      el.addEventListener('input', () => {
+        state[key] = el.value;
+        // Only re-render nav button state, not entire card
+        updateStep5Nav();
+      });
+      el.addEventListener('blur', () => {
+        // Trigger full re-render on blur to show validation messages
+        state[key] = el.value;
+        render();
+      });
+    };
+    attachInput('firstName', 'firstName');
+    attachInput('lastName', 'lastName');
+    attachInput('email', 'email');
+    attachInput('phone', 'phone');
+  }
+}
+
+function renderResults(card) {
+  const r = computeResults(); const d = state;
+  const firstName = d.firstName;
+
+  const solarCard = !r.hasSolar
+    ? `<div class="result-card" style="background:#f0faff;border:1.5px solid #bde8fc;border-left:4px solid var(--sky)"><div class="rc-title"><span style="font-size:17px">☀️</span><span>Go Solar — Your Biggest Opportunity</span></div><p>Based on your ${r.sqftMid.toLocaleString()} sq ft home and <strong>$${r.bill}/month</strong> bill, a <strong>~${r.systemSize} kW system</strong> could offset up to <strong>${Math.round(r.solarPct*100)}%</strong> of your costs — saving approximately <strong>$${r.solarMonthlySavings}/month</strong> or <strong>$${r.solarAnnualSavings.toLocaleString()}/year</strong>.</p></div>`
+    : `<div class="result-card" style="background:#f0faff;border:1.5px solid #bde8fc;border-left:4px solid var(--sky)"><div class="rc-title"><span style="font-size:17px">☀️</span><span>You Have Solar — Great Start!</span></div><p>You're already benefiting from solar. Let's look at what else can maximize your energy independence.</p></div>`;
+
+  const battCard = r.batterySavings > 0
+    ? `<div class="result-card" style="background:#eef6ff;border:1.5px solid #b3d4f0;border-left:4px solid var(--navy)"><div class="rc-title"><span style="font-size:17px">🔋</span><span>${r.hasSolar&&!r.hasBattery?"Add a Home Battery":"Expand Your Battery Storage"}</span></div><p>${r.hasSolar&&!r.hasBattery?"You have solar but no battery — excess power is sold back at low rates and repurchased at peak rates. A home battery stores your unused energy.":"A home battery paired with solar provides backup power and reduces grid dependency."} <strong>Estimated savings: $${r.batterySavings.toLocaleString()}/year.</strong></p></div>` : "";
+
+  const hvacCard = r.hvacSavings > 0
+    ? `<div class="result-card" style="background:#fff4f3;border:1.5px solid #ffc5c0;border-left:4px solid var(--coral)"><div class="rc-title"><span style="font-size:17px">❄️</span><span>HVAC Upgrade Recommended</span></div><p>${r.hvacNote} <strong>Potential savings: $${r.hvacSavings.toLocaleString()}/year.</strong></p></div>`
+    : `<div class="result-card" style="background:#f0faff;border:1.5px solid #bde8fc;border-left:4px solid var(--sky)"><div class="rc-title"><span style="font-size:17px">✅</span><span>HVAC — Looking Good</span></div><p>Your HVAC appears relatively new. Keep it at peak efficiency with Empower's semi-annual maintenance plans.</p></div>`;
+
+  const roofCard = r.roofOld
+    ? `<div class="result-card" style="background:#fff8f0;border:1.5px solid #ffd9a0;border-left:4px solid #e8a020"><div class="rc-title"><span style="font-size:17px">⚠️</span><span>Roof Inspection Recommended</span></div><p>Your ${r.roofType.toLowerCase()} roof is <strong>over 15 years old</strong>. Inspect the underlayment before solar installation.${r.roofVeryOld?" At 20+ years, a full roof evaluation is strongly advised.":""}</p></div>`
+    : `<div class="result-card" style="background:#f0faff;border:1.5px solid #bde8fc;border-left:4px solid var(--sky)"><div class="rc-title"><span style="font-size:17px">✅</span><span>Roof — Ready for Solar</span></div><p>Your roof is in great shape and is an excellent candidate for solar panel installation.</p></div>`;
+
+  card.innerHTML = `
+    <div class="results-header">
+      ${logoHTML()}
+      <p class="results-greeting">Hi <strong>${firstName}</strong>, here's your personalized report:</p>
+      <p class="results-label">Estimated Annual Savings Potential</p>
+      <div class="results-amount">$${r.totalAnnualSavings.toLocaleString()}</div>
+      <p class="results-sub">per year across all recommended upgrades</p>
+    </div>
+    <div class="card-body">
+      ${solarCard}${battCard}${hvacCard}${roofCard}
+      <div class="cta-box">
+        <div class="cta-label">Next Steps</div>
+        <div class="cta-title">An Empower Expert Will Be in Touch</div>
+        <p class="cta-sub">We'll reach out to <strong style="color:rgba(255,255,255,0.85)">${d.email}</strong> shortly to walk you through your custom savings plan.</p>
+        <div class="cta-btns">
+          <a href="https://www.empoweryourhome.com/contact-us" target="_blank" class="cta-primary">Visit Our Website</a>
+          <a href="tel:8664996452" class="cta-secondary">📞 (866) 499-6452</a>
+        </div>
+      </div>
+      <button class="restart-btn" onclick="restart()">Start Over</button>
+    </div>`;
+}
+
+function restart() {
+  state = { step:0, firstName:"", lastName:"", email:"", phone:"", interests:[], electricBill:"", sqft:"", stories:"", yearBuilt:"", hasSolar:"", solarKwh:"", hasBattery:"", batteries:"0", hvac1Age:"", hasSecondHvac:"no", hvac2Age:"", roofAge:"", roofType:"", submitting:false, submitError:null };
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
