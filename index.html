@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self' https://empoweryourhome.com https://*.empoweryourhome.com">
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Empower Home Services — Free Energy Analysis</title>
@@ -108,6 +109,11 @@
 </style>
 </head>
 <body>
+ <script>
+  if (window.top !== window.self && !/(empoweryourhome\.com)/.test(document.referrer)) {
+    document.body.innerHTML = '';
+  }
+</script>
 <div id="app">
   <div class="card" id="quiz-card"></div>
   <p class="footer">Estimates based on typical usage patterns and may vary. Contact Empower for a precise assessment.<br>CA LIC #1057693 · AZ ROC #346621 · TECL #38765</p>
