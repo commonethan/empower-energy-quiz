@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self' https://empoweryourhome.com https://*.empoweryourhome.com">
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Empower Home Services — Free Energy Analysis</title>
@@ -109,11 +108,6 @@
 </style>
 </head>
 <body>
- <script>
-  if (window.top !== window.self && !/(empoweryourhome\.com)/.test(document.referrer)) {
-    document.body.innerHTML = '';
-  }
-</script>
 <div id="app">
   <div class="card" id="quiz-card"></div>
   <p class="footer">Estimates based on typical usage patterns and may vary. Contact Empower for a precise assessment.<br>CA LIC #1057693 · AZ ROC #346621 · TECL #38765</p>
@@ -272,15 +266,11 @@ async function submitToZapier() {
     "Source": "Empower Energy Quiz"
   };
   if (!SUBMIT_LIVE) { console.log("[Zapier] Preview:", payload); return; }
-  try {
-    const res = await fetch(WEBHOOK_URL, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) });
-    // Zapier returns 200 on success — treat anything in 200-299 range as success
-    if (res.status < 200 || res.status >= 300) throw new Error(`Webhook ${res.status}`);
-  } catch(err) {
-    // If it's a network/CORS error in dev, log but don't block
-    console.warn("[Zapier] fetch error:", err);
-    throw err;
-  }
+  fetch(WEBHOOK_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  }).catch(() => {}); // CORS blocks the response but data lands in Zapier
 }
 
 // ── HTML helpers ─────────────────────────────────────────────────────────────
